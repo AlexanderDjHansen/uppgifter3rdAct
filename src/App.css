@@ -1,0 +1,43 @@
+.App {
+  display: flex;
+  justify-content: space-evenly;
+}
+
+.timer {
+  width: 20rem;
+  padding: 1rem;
+}
+
+.timer-container {
+  border: 1px solid black;
+  padding: 1rem;
+}
+
+.reset-button {
+  margin-top: 1rem;
+  width: 12rem;
+}
+
+.converter {
+  justify-content: center;
+}
+
+.input {
+  margin: 5px;
+}
+
+.container {
+  display: flex;
+  border: 1px solid black;
+  padding: 1rem;
+  margin-top: 1rem;
+}
+
+.counter {
+margin-top: 1rem;
+}
+
+.counter-container {
+  border: 1px solid black;
+  padding: 1rem;
+}
