@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import "../App.css";
 
+// https://upmostly.com/tutorials/setinterval-in-react-components-using-hooks
+// Använde den sidan för att hitta formeln för stopur funktionen.
+
 const Timer = () => {
   const [isActive, setIsActive] = useState(true);
   const [isPaused, setIsPaused] = useState(false);

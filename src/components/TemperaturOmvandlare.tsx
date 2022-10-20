@@ -4,6 +4,8 @@ import "../App.css";
 // Formel F till C: C = (F - 32) * (5/9).
 // Formel C till F: F = C * (9/5) + 32.
 
+// Fick inte till det med att man ska kunna ta in en string i inputfältet utan att det ger NaN.
+
 const TemperaturOmvandlare = () => {
   const [temperature, setTemperature] = useState<any>({
     fahrenheit: "",
