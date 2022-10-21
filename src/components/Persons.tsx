@@ -1,5 +1,6 @@
 import React from "react";
 import { FormEvent, useState } from "react";
+import { on } from "stream";
 import "../components/styles/NamesList.style.css";
 import ListPersons from "./ListPersons";
 import { IPerson } from "./models/IPerson";
@@ -32,7 +33,6 @@ const Persons = (props: INewPersonProps) => {
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(id);
     
     if (persons) {   
       props.save(persons);
@@ -40,12 +40,15 @@ const Persons = (props: INewPersonProps) => {
     }
   };
 
-  const handleClick = (index: number) => {
-    console.log(index);
+  const handleClick = ( index: number,name: IPerson) => {
+    console.log(name, index);
+    
+    
+
   }
 
   const handleSelect = () => {
-    console.log("hej");
+    
     
   }
 
@@ -73,14 +76,14 @@ const Persons = (props: INewPersonProps) => {
                     filter === ""
                 )
                 .map((name, index) => (
-                  <input
-                    className="names"
+                  <li
                     key={index}
-                    onClick={() => handleClick(id)}
-                    readOnly
+                    className="names"
+                    onClick={() => handleClick(index, name)}
                     onSelect={handleSelect}
-                    value={name.firstname + " " + name.lastname}
-                  />
+                    >
+                   {name.firstname + " " + name.lastname}
+                    </li>
                 ))}
             </ul>
           </div>
@@ -89,6 +92,7 @@ const Persons = (props: INewPersonProps) => {
               <div>
                 <label>Firstname: </label>
                 <input
+                    id="input-first"
                   type="text"
                   name="firstname"
                   value={persons?.firstname}
@@ -99,6 +103,7 @@ const Persons = (props: INewPersonProps) => {
               <div>
                 <label>Surname: </label>
                 <input
+                id="input-last"
                   type="text"
                   name="lastname"
                   value={persons?.lastname}
