@@ -8,8 +8,10 @@ const Timer = () => {
   const [isActive, setIsActive] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const [time, setTime] = useState(0);
-  const [maxValue, setMaxValue] = useState(10);
+  const [maxValue, setMaxValue] = useState(100);
 
+  // console.log(new Date().getTime()); 
+  
   const changeDuration = (e: any) => {
     setMaxValue(e.target.value);
     setIsPaused(false);
@@ -18,13 +20,13 @@ const Timer = () => {
   useEffect(() => {
     let interval: any = null;
 
-    if (time == maxValue) {
+    if (time >= maxValue) {
       setIsPaused(true);
     }
     if (isActive && isPaused === false) {
       interval = setInterval(() => {
-        setTime((prevTime) => prevTime + 1);
-      }, 1000);
+        setTime((prevTime) => (prevTime + 0.1));
+      }, 100);
     } else {
       clearInterval(interval);
     }
@@ -39,6 +41,7 @@ const Timer = () => {
           <progress max={maxValue} value={time}></progress>
         </div>
         <div>
+        
           <span>{time}s</span>
         </div>
         <div>
@@ -46,7 +49,7 @@ const Timer = () => {
           <input
             type="range"
             min={1}
-            max={10}
+            max={100}
             step={1}
             value={maxValue}
             onChange={(e) => changeDuration(e)}
