@@ -1,68 +1,65 @@
 import { ChangeEvent, useRef } from "react";
 import { FormEvent, useState } from "react";
-import "../styles/NamesList.style.css"
+import "../styles/NamesList.style.css";
 import { INewPersonProps, IPerson } from "../models/IPerson";
 
 // https://stackoverflow.com/questions/41436253/how-to-filter-list-while-typing-with-input-field
 
-
-
 const Persons = (props: INewPersonProps) => {
+  const [filter, setFilter] = useState("");
+  const [inputPerson, setInputPerson] = useState<{firstname: string, lastname: string }>({
+    firstname: "",
+    lastname: "",
+  });
+  const [selectedPersonId, setSelectedPersonId] = useState<number | null>(null);
 
-    const firstnameRef = useRef<any>()
-    const lastnameRef = useRef<any>()
-    const [count, setCount] = useState<number>(1);
-    const [persons, setPersons] = useState<IPerson>({id: 1, firstname: "", lastname: ""});
-    const [currentPerson, setCurrentPerson] = useState(persons);
-    const [isUpdating, setIsUpdating] = useState(false)
-    const [filter, setFilter] = useState("");
- 
-
-
-    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (persons) {
-      setPersons({ ...persons, [e.target.name]: e.target.value }); 
-    } else {
-      let person: IPerson = {id: 1, firstname: "", lastname: "" };
-      setPersons({ ...person, [e.target.name]: e.target.value });
-      console.log("hej från else");
-    }
-    };
-
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (persons.firstname && persons.lastname) {   
-      props.addPerson(persons);
-      setPersons({id: count + 1, firstname: "", lastname: "" });
-      setCount(count + 1);
-    }
+  const onInputPersonFieldChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setInputPerson({ ...inputPerson, [e.target.name]: e.target.value });
   };
 
-  const handleUpdate = (e: FormEvent<HTMLFormElement>) => {
-      e.preventDefault();
-      
-      
-      setIsUpdating(false)
-      console.log(isUpdating);
-  }
+  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const nextId: number = props.getNextId();
+    props.addPerson({
+      id: nextId,
+      firstname: inputPerson.firstname,
+      lastname: inputPerson.lastname,
+    });
+    setInputPerson({ firstname: "", lastname: "" });
+  };
 
-  const handleDelete = () => {
-    
-  }
+  const onClickListItem = (person: IPerson) => {
+    console.log(person);
 
-  const handleClick = (index: number, person: IPerson) => {
-      if ((index == persons.id)) {
-        firstnameRef.current.focus()}
-        setIsUpdating(true)
-        setCurrentPerson(person)
-        console.log(currentPerson);
-        console.log(isUpdating);
-        console.log("#"+index + " Li is focused");
-       
-      // lastnameRef.current.focus()
+    setSelectedPersonId(person.id);
+    setInputPerson({
+      firstname: person.firstname,
+      lastname: person.lastname,
+    });
+  };
+
+  const onUpdate = (e: FormEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+      if (selectedPersonId){
+    props.updatePerson({id: selectedPersonId, firstname: inputPerson.firstname, lastname: inputPerson.lastname});
+    setInputPerson({  firstname: "", lastname: "" });
   }
-  
- 
+  };
+
+  const onDelete = (e: FormEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    if (selectedPersonId){
+    props.deletePerson({id: selectedPersonId, firstname: inputPerson.firstname, lastname: inputPerson.lastname});
+    setInputPerson({  firstname: "", lastname: "" });
+  }
+  };
+
+  const onAbort = (e: FormEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+    setInputPerson({  firstname: "", lastname: "" });
+    setSelectedPersonId(null);
+  };
+
   return (
     <>
       <div className="form-container">
@@ -76,43 +73,44 @@ const Persons = (props: INewPersonProps) => {
             onChange={(e) => setFilter(e.target.value)}
           />
         </div>
-        { isUpdating ? 
+
         <div className="body">
           <div className="name-list">
             <ul className="list-item">
-              {props.listPersons
+              {props.people
                 .filter(
-                  (f) =>
-                    f.firstname.includes(filter) ||
-                    f.lastname.includes(filter) ||
+                  (person) =>
+                    person.firstname
+                      .toLowerCase()
+                      .includes(filter.toLowerCase()) ||
+                    person.lastname
+                      .toLowerCase()
+                      .includes(filter.toLowerCase()) ||
                     filter === ""
                 )
-                .map((name) => (
+                .map((person) => (
                   <li
-                    ref={firstnameRef}
-                    key={name.id}
+                    key={person.id}
                     className="names"
-                    // onSelect={() => handleSelect(name.id)}
-                    onClick={() => handleClick(name.id, name)}
-                    tabIndex={name.id}
-                    >
-                   {name.firstname + " " + name.lastname}
-            
-                    </li>
+                    onClick={() => onClickListItem(person)}
+                    tabIndex={person.id}
+                  >
+                    {person.firstname + " " + person.lastname}
+                  </li>
                 ))}
             </ul>
           </div>
           <div className="input-container">
-            <form id="update-person-form" onSubmit={handleUpdate}>
+            <form id="add-person-form" onSubmit={onSubmit}>
               <div>
                 <label>Firstname: </label>
                 <input
-                 
-                  id="input-first"
+                  id="input-firstname"
                   type="text"
                   name="firstname"
-                  value={persons.firstname}
-                  onChange={(e) => {handleChange(e)
+                  value={inputPerson.firstname}
+                  onChange={(e) => {
+                    onInputPersonFieldChange(e);
                   }}
                   required
                 />
@@ -120,90 +118,40 @@ const Persons = (props: INewPersonProps) => {
               <div>
                 <label>Surname: </label>
                 <input
-                 
-                  id="input-last"
+                  id="input-lastname"
                   type="text"
                   name="lastname"
-                  value={persons.lastname}
-                  onChange={(e) => handleChange(e)}
+                  value={inputPerson.lastname}
+                  onChange={(e) => onInputPersonFieldChange(e)}
                   required
                 />
               </div>
             </form>
           </div>
-        </div> 
-        : 
-        <div className="body">
-          <div className="name-list">
-            <ul className="list-item">
-              {props.listPersons
-                .filter(
-                  (f) =>
-                    f.firstname.includes(filter) ||
-                    f.lastname.includes(filter) ||
-                    filter === ""
-                )
-                .map((name) => (
-                  <li
-                  ref={firstnameRef}
-                    key={name.id}
-                    className="names"
-                    // onSelect={() => handleSelect(name.id)}
-                    onClick={() => handleClick(name.id, name)}
-                    tabIndex={name.id}
-                    >
-                   {name.firstname + " " + name.lastname}
-            
-                    </li>
-                ))}
-            </ul>
-          </div>
-          <div className="input-container">
-            <form id="add-person-form" onSubmit={handleSubmit}>
-              <div>
-                <label>Firstname: </label>
-                <input
-                 
-                  id="input-first"
-                  type="text"
-                  name="firstname"
-                  value={persons.firstname}
-                  onChange={(e) => {handleChange(e)
-                  }}
-                  required
-                />
-              </div>
-              <div>
-                <label>Surname: </label>
-                <input
-                 
-                  id="input-last"
-                  type="text"
-                  name="lastname"
-                  value={persons.lastname}
-                  onChange={(e) => handleChange(e)}
-                  required
-                />
-              </div>
-            </form>
-          </div>
-        </div> 
-        }
-
-        <button
-          form="add-person-form"
-          className="button-create"
-          onClick={() => handleSubmit}
-        >
-          Create
-        </button>
-
-        <button className="button-update" form="update-person-form" onClick={() => handleUpdate}>Update</button>
-        <button className="button-delete" onClick={() => handleDelete}>Delete</button>
-        
+          {selectedPersonId === null && (
+            <button
+              form="add-person-form"
+              className="button-create"
+              onClick={() => onSubmit}
+            >
+              Create
+            </button>
+          )} 
+        </div>
+            {selectedPersonId !== null && (
+        <><button onClick={(e) => onAbort(e)}> Avbryt</button><button
+            className="button-update"
+            form="update-person-form"
+            onClick={(e) => onUpdate(e)}
+          >
+            Update
+          </button><button className="button-delete" onClick={(e) => onDelete(e)}>
+              Delete
+            </button></>
+        )}
       </div>
-    </> 
-  )
-}
+    </>
+  );
+};
 
 export default Persons;

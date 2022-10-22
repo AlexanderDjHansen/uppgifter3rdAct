@@ -3,21 +3,39 @@ import { IPerson } from "../models/IPerson";
 import Persons from "./Persons";
 
  const ListPersons = () => {
-     const [listPersons, setListPersons] = useState<IPerson[]>([
 
+     const [people, setPeople] = useState<IPerson[]>([
      ]);
+     const [nextId, setNextId] = useState<number>(1)
+
+     const getNextId = (): number => {
+        const returnValue: number = nextId.valueOf();
+
+        setNextId(nextId + 1);
+    
+        return returnValue;
+   }  
 
     const addPerson = (newPerson: IPerson) => {
-         setListPersons([...listPersons, newPerson]);
+         setPeople([...people, newPerson]);
     }     
+
+    const updatePerson = (person: IPerson) => {
+        const personIndex = people.findIndex((p) => p.id === person.id);
+        if (personIndex !== -1){
+           const newList: IPerson[] = [...people]
+            newList[personIndex] = person
+            setPeople(newList);
+        }
+    }
     
-    const deletePerson = (id: number) => {
-          setListPersons(listPersons.filter((person) => person.id !== id)) 
+    const deletePerson = (person: IPerson) => {
+          setPeople(people.filter((p) => p.id !== person.id)) 
       }
 
      return (
          <>
-         <Persons addPerson={addPerson} listPersons={listPersons} delete={deletePerson} />
+         <Persons people={people} getNextId={getNextId} addPerson={addPerson}  updatePerson={updatePerson} deletePerson={deletePerson}/>
          </>
      )
     

@@ -5,8 +5,11 @@ export interface IPerson {
 }
 
 export interface INewPersonProps {
+    people: IPerson[];
+    getNextId(): number
     addPerson(p: IPerson): void;
-    delete(p: number): void
-    listPersons: IPerson[];
-  
+    updatePerson(p: IPerson): void;
+    deletePerson(p: IPerson): void
+   
+    
   }
